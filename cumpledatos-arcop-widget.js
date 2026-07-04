@@ -48,7 +48,7 @@
     endpoint: SCRIPT.getAttribute("data-endpoint") || "",
     privacyUrl: SCRIPT.getAttribute("data-privacy-url") || "",
     autoButton: SCRIPT.getAttribute("data-auto-button") !== "false",
-    colorPrimary: SCRIPT.getAttribute("data-color-primary") || "#0E2841",
+    colorPrimary: SCRIPT.getAttribute("data-color-primary") || "#FFFFFF",
     colorAccent: SCRIPT.getAttribute("data-color-accent") || "#1F5C8B",
     colorSuccess: SCRIPT.getAttribute("data-color-success") || "#0F766E",
     label: SCRIPT.getAttribute("data-label") || "Ejercer mis derechos ARCO-P",
