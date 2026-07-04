@@ -42,13 +42,25 @@
 (function () {
   "use strict";
 
-  var SCRIPT = document.currentScript;
+  console.log("[CumpleDatos ARCO-P] archivo cargado, ejecutando...");
+
+  var SCRIPT =
+    document.currentScript ||
+    document.querySelector("script[data-client][data-endpoint]");
+
+  console.log("[CumpleDatos ARCO-P] SCRIPT usado:", SCRIPT);
+
+  if (!SCRIPT) {
+    console.error("[CumpleDatos ARCO-P] No se encontró el <script> con data-client/data-endpoint.");
+    return;
+  }
+
   var CFG = {
     clientId: SCRIPT.getAttribute("data-client") || "",
     endpoint: SCRIPT.getAttribute("data-endpoint") || "",
     privacyUrl: SCRIPT.getAttribute("data-privacy-url") || "",
     autoButton: SCRIPT.getAttribute("data-auto-button") !== "false",
-    colorPrimary: SCRIPT.getAttribute("data-color-primary") || "#FFFFFF",
+    colorPrimary: SCRIPT.getAttribute("data-color-primary") || "#0E2841",
     colorAccent: SCRIPT.getAttribute("data-color-accent") || "#1F5C8B",
     colorSuccess: SCRIPT.getAttribute("data-color-success") || "#0F766E",
     label: SCRIPT.getAttribute("data-label") || "Ejercer mis derechos ARCO-P",
@@ -64,13 +76,18 @@
     "top-left": "left:" + CFG.offset + "px;top:" + CFG.offset + "px;",
   }[CFG.position] || "right:" + CFG.offset + "px;bottom:" + CFG.offset + "px;";
 
+  console.log("[CumpleDatos ARCO-P] CFG:", CFG);
+
   if (!CFG.endpoint || !CFG.clientId) {
     console.error("[CumpleDatos ARCO-P] Faltan data-client y/o data-endpoint en el <script>.");
     return;
   }
 
   var NS = "cdt-arcop";
-  if (document.getElementById(NS + "-styles")) return; // evita doble inyección
+  if (document.getElementById(NS + "-styles")) {
+    console.warn("[CumpleDatos ARCO-P] Ya existía #cdt-arcop-styles, se detiene para evitar doble inyección.");
+    return; // evita doble inyección
+  }
 
   /* ---------- Estilos (namespaced, no interfieren con el sitio host) ---------- */
   var style = document.createElement("style");
@@ -212,6 +229,8 @@
   window.addEventListener("message", function (e) {
     if (e && e.data && e.data.type === "cdt-arcop-open") openModal();
   });
+
+  console.log("[CumpleDatos ARCO-P] listo, window.cdtArcop definido:", window.cdtArcop);
 
   /* ---------- Envío ---------- */
   form.addEventListener("submit", function (e) {
