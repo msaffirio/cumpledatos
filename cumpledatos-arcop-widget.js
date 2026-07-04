@@ -200,10 +200,18 @@
     document.body.appendChild(fab);
   }
 
-  // API pública: útil en Wix/Webflow/Squarespace, donde no siempre se puede
-  // agregar el atributo data-cdt-arcop-open a un botón nativo del editor.
-  // Basta con llamar window.cdtArcop.open() desde el onClick del botón.
+  // API pública: útil en Webflow/Squarespace/HTML propio, donde se puede
+  // llamar directamente window.cdtArcop.open() desde el onClick del botón.
   window.cdtArcop = { open: openModal, close: closeModal };
+
+  // Puente por postMessage: en Wix, el código de página de Velo corre en un
+  // Web Worker sin acceso al window real, así que no puede llamar
+  // window.cdtArcop directamente. En su lugar, un elemento "Embed HTML" de
+  // Wix (que SÍ vive en un iframe normal del navegador) puede enviar este
+  // mensaje para abrir el modal, sin pasar por Velo.
+  window.addEventListener("message", function (e) {
+    if (e && e.data && e.data.type === "cdt-arcop-open") openModal();
+  });
 
   /* ---------- Envío ---------- */
   form.addEventListener("submit", function (e) {
