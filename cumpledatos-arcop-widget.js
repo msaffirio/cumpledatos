@@ -8,7 +8,14 @@
  *           data-client="ACME"
  *           data-endpoint="https://puente.artion.cl/api/arcop"
  *           data-privacy-url="https://acme.cl/politica-privacidad"
+ *           data-position="bottom-right"
+ *           data-offset="20"
+ *           data-font-size="14"
  *           defer></script>
+ *
+ * data-position acepta: bottom-right (por defecto), bottom-left, top-right, top-left
+ * data-offset: separación en px desde el borde de la pantalla (por defecto 20)
+ * data-font-size: tamaño en px del texto del botón flotante (por defecto 14)
  *
  * Por defecto inyecta un botón flotante "Ejercer mis derechos ARCO-P".
  * Si el Cliente ya tiene su propio botón, basta con agregarle el atributo
@@ -45,7 +52,17 @@
     colorAccent: SCRIPT.getAttribute("data-color-accent") || "#1F5C8B",
     colorSuccess: SCRIPT.getAttribute("data-color-success") || "#0F766E",
     label: SCRIPT.getAttribute("data-label") || "Ejercer mis derechos ARCO-P",
+    position: SCRIPT.getAttribute("data-position") || "bottom-right",
+    offset: parseInt(SCRIPT.getAttribute("data-offset"), 10) || 20,
+    fontSize: parseInt(SCRIPT.getAttribute("data-font-size"), 10) || 14,
   };
+
+  var POSITION_CSS = {
+    "bottom-right": "right:" + CFG.offset + "px;bottom:" + CFG.offset + "px;",
+    "bottom-left": "left:" + CFG.offset + "px;bottom:" + CFG.offset + "px;",
+    "top-right": "right:" + CFG.offset + "px;top:" + CFG.offset + "px;",
+    "top-left": "left:" + CFG.offset + "px;top:" + CFG.offset + "px;",
+  }[CFG.position] || "right:" + CFG.offset + "px;bottom:" + CFG.offset + "px;";
 
   if (!CFG.endpoint || !CFG.clientId) {
     console.error("[CumpleDatos ARCO-P] Faltan data-client y/o data-endpoint en el <script>.");
@@ -59,9 +76,9 @@
   var style = document.createElement("style");
   style.id = NS + "-styles";
   style.textContent = [
-    "." + NS + "-fab{position:fixed;right:20px;bottom:20px;z-index:999998;",
+    "." + NS + "-fab{position:fixed;" + POSITION_CSS + "z-index:999998;",
     "background:" + CFG.colorPrimary + ";color:#fff;border:none;border-radius:999px;",
-    "padding:12px 18px;font:600 14px/1.2 Arial,sans-serif;cursor:pointer;",
+    "padding:12px 18px;font:600 " + CFG.fontSize + "px/1.2 Arial,sans-serif;cursor:pointer;",
     "box-shadow:0 4px 14px rgba(0,0,0,.25);}",
     "." + NS + "-overlay{position:fixed;inset:0;background:rgba(14,40,65,.55);",
     "z-index:999999;display:none;align-items:center;justify-content:center;padding:16px;}",
@@ -182,6 +199,11 @@
     fab.addEventListener("click", openModal);
     document.body.appendChild(fab);
   }
+
+  // API pública: útil en Wix/Webflow/Squarespace, donde no siempre se puede
+  // agregar el atributo data-cdt-arcop-open a un botón nativo del editor.
+  // Basta con llamar window.cdtArcop.open() desde el onClick del botón.
+  window.cdtArcop = { open: openModal, close: closeModal };
 
   /* ---------- Envío ---------- */
   form.addEventListener("submit", function (e) {
